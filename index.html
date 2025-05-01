@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    .dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+    }
+    .settings {
+      display: flex;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 10px;
+      margin: 20px 0;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border: 2px solid #007bff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .dark-mode .cell {
+      background-color: #1c1c1c;
+    }
+    .dark-mode .cell.x, .dark-mode .cell.o {
+      color: #fff;
+    }
+    .btn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .status {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      text-align: center;
+    }
+    footer {
+      text-align: center;
+      margin-top: 0px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+  
+    <div class="settings">
+      <button id="darkModeBtn" class="btn">Dark Mode</button>
+      <button id="soundToggleBtn" class="btn">Sound: On</button>
+      <button id="aboutBtn" class="btn">About</button>
+      <button id="privacy" class="btn" type="submit">Privacy</button>
+    </div>
+  </header>
+  <div class="container">
+    <div class="board" id="board"></div>
+    <p id="status" class="status"></p>
+    <button id="resetBtn" class="btn">Reset Game</button>
+  </div>
+  
+
+  <script>
+    let darkMode = false;
+    let soundOn = true;
+    let computerMode = false;
+    let currentPlayer = 'X';
+    let gameBoard = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = true;
+    const board = document.getElementById('board');
+    const status = document.getElementById('status');
+
+    const winConditions = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(frequency) {
+      if (!soundOn) return;
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.2);
+    }
+
+    function initGame() {
+      board.innerHTML = '';
+      gameBoard = ['', '', '', '', '', '', '', '', ''];
+      gameActive = true;
+      currentPlayer = 'X';
+      status.textContent = `Player ${currentPlayer}'s turn`;
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+    }
+
+    function handleCellClick(e) {
+      const index = e.target.dataset.index;
+
+      if (gameBoard[index] !== '' || !gameActive) return;
+
+      playSound(440); // Play click sound
+      gameBoard[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+      e.target.classList.add(currentPlayer.toLowerCase());
+
+      checkWinner();
+
+      if (gameActive) {
+        if (computerMode && currentPlayer === 'X') {
+          // Trigger computer's move automatically
+          setTimeout(computerMove, 500);
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          status.textContent = gameActive
+            ? `Player ${currentPlayer}'s turn`
+            : `Game Over`;
+        }
+      }
+    }
+
+    
+
+    function checkWinner() {
+      for (let condition of winConditions) {
+        const [a, b, c] = condition;
+        if (
+          gameBoard[a] &&
+          gameBoard[a] === gameBoard[b] &&
+          gameBoard[a] === gameBoard[c]
+        ) {
+          status.textContent = `Player ${gameBoard[a]} wins!`;
+          playSound(1000);
+          gameActive = false;
+          return;
+        }
+      }
+      if (!gameBoard.includes('')) {
+        status.textContent = 'Draw!';
+        gameActive = false;
+      }
+    }
+
+    document.getElementById('darkModeBtn').addEventListener('click', () => {
+      playSound(330);
+      darkMode = !darkMode;
+      document.body.classList.toggle('dark-mode');
+    });
+
+    document.getElementById('soundToggleBtn').addEventListener('click', () => {
+      playSound(330);
+      soundOn = !soundOn;
+      document.getElementById('soundToggleBtn').textContent = soundOn
+        ? 'Sound: On'
+        : 'Sound: Off';
+    });
+
+    document.getElementById('aboutBtn').addEventListener('click', () => {
+      playSound(330);
+      alert('Tic Tac Toe Game\nVersion: 1.0\nDeveloped for enjoy!\n2024 Tic Tac Toe Game by \nShahi!'
+      );
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      playSound(330);
+      initGame();
+    });
+    document.getElementById('privacy').addEventListener('click', () => {
+  alert("Privacy Policy:\n\n" +
+"This app (“App”) displays public web content using WebView and shows ads using Google AdMob.\n\n" +
+"We do not collect any personal information from users.\n\n" +
+"Ads may collect anonymized data through AdMob as per Google’s policies.\n\n" +
+"This app may load websites or services that have their own privacy policies.\n\n" +
+"Contact: your_email@gmail.com\n" +
+"Effective Date: April 29, 2025")
+});
+
+    initGame();
+  </script>
+</body>
+</html>
