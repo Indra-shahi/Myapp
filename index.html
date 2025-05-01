@@ -81,6 +81,13 @@
       text-align: center;
       margin-top: 0px;
     }
+    #b{
+      font-weight: bold;
+      color: blue;
+      background: white;
+      border: none;
+      margin-left: 150px;
+    }
   </style>
 </head>
 <body>
@@ -92,7 +99,13 @@
       <button id="aboutBtn" class="btn">About</button>
       <button id="privacy" class="btn" type="submit">Privacy</button>
     </div>
+   
   </header>
+   <br />
+   <button id="b" type="submit">clear</button>
+ <section id="info">
+   
+ </section>
   <div class="container">
     <div class="board" id="board"></div>
     <p id="status" class="status"></p>
@@ -101,6 +114,7 @@
   
 
   <script>
+  
     let darkMode = false;
     let soundOn = true;
     let computerMode = false;
@@ -214,8 +228,8 @@
 
     document.getElementById('aboutBtn').addEventListener('click', () => {
       playSound(330);
-      alert('Tic Tac Toe Game\nVersion: 1.0\nDeveloped for enjoy!\n2024 Tic Tac Toe Game by \nShahi!'
-      );
+      document.getElementById('info').innerHTML='Tic Tac Toe Game\nVersion: 1.0\nDeveloped for enjoy!\n2024 Tic Tac Toe Game by \nShahi!';
+      
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
@@ -223,16 +237,20 @@
       initGame();
     });
     document.getElementById('privacy').addEventListener('click', () => {
-  alert("Privacy Policy:\n\n" +
+      document.getElementById('info').innerHTML="Privacy Policy: \n\ n " +
 "This app (“App”) displays public web content using WebView and shows ads using Google AdMob.\n\n" +
 "We do not collect any personal information from users.\n\n" +
 "Ads may collect anonymized data through AdMob as per Google’s policies.\n\n" +
 "This app may load websites or services that have their own privacy policies.\n\n" +
 "Contact: your_email@gmail.com\n" +
-"Effective Date: April 29, 2025")
+"Effective Date: April 29, 2025";
+   playSound(330);
 });
 
+document.getElementById('b').addEventListener('click',()=>{
+  document.getElementById('info').innerHTML=' ';
+})
     initGame();
   </script>
-</body>
-</html>
+</bod
+  </html>hkd
